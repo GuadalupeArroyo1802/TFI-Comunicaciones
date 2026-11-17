@@ -1,0 +1,13 @@
+Comparador de Métodos de Paridad - versión web
+TFI Comunicaciones - UTN FRT
+
+CÓMO ABRIRLO
+1. Extraé el ZIP (clic derecho > "Extraer todo"). No lo abras desde adentro del ZIP.
+2. Doble clic en index.html. Funciona en cualquier navegador, sin instalar nada.
+   Este index.html trae todo adentro (diseño + código), así que también funciona si lo copiás solo.
+
+CÓDIGO FUENTE (carpeta codigo_fuente/, mismo programa separado en archivos para leerlo mejor)
+  index.html              -> estructura de la interfaz (equivale a la ventana Tkinter de main.py)
+  css/estilos.css         -> colores y diseño (verde oliva y crema)
+  js/paridad_logica.js    -> traducción 1 a 1 de paridad_logica.py
+  js/app.js               -> manejo de la interfaz (equivale a la clase ComparadorParidadApp)

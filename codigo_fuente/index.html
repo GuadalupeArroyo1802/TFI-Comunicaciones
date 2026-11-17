@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comparador de Paridad</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<!--CONTENIDO-->
+<header class="barra">
+  <div class="barra-in">
+    <div>
+      <p class="eyebrow">TFI - Cátedra Comunicaciones</p>
+      <h1>Comparador de Métodos de Paridad</h1>
+    </div>
+    <ol class="pipeline" aria-label="Recorrido de la trama">
+      <li><span class="etapa">Emisor</span><span class="estado" id="est-emisor">Sin trama</span></li>
+      <li><span class="etapa">Canal</span><span class="estado" id="est-canal">—</span></li>
+      <li><span class="etapa">Receptor</span><span class="estado" id="est-receptor">—</span></li>
+    </ol>
+  </div>
+</header>
+
+<div class="wrap">
+  <main class="layout">
+    <!-- Columna izquierda: paneles 1 y 3 -->
+    <div class="col">
+
+      <section class="panel" aria-labelledby="t-config">
+        <div class="panel-head">
+          <h2 id="t-config"><span class="num">1</span>Configuración de la trama</h2>
+        </div>
+        <div class="panel-body">
+          <div class="opciones" role="radiogroup" aria-label="Tipo de entrada">
+            <label class="opcion"><input type="radio" name="modo" id="modo-texto" value="texto" checked>Texto (se convierte a ASCII)</label>
+            <label class="opcion"><input type="radio" name="modo" id="modo-bits" value="bits">Bits manuales (0 y 1)</label>
+          </div>
+
+          <div class="field">
+            <label for="entrada" id="lbl-entrada">Ingresá el texto:</label>
+            <input type="text" id="entrada" autocomplete="off" spellcheck="false" value="HOLA">
+            <span class="contador" id="contador"></span>
+          </div>
+
+          <div class="field">
+            <label for="columnas">Columnas por fila (bits por unidad de dato):</label>
+            <div class="fila-campos">
+              <input type="number" id="columnas" min="2" max="16" value="8" disabled>
+              <p class="hint" id="hint-columnas">(fijo en modo texto: 8 bits = 1 carácter ASCII)</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" id="lbl-paridad">Tipo de paridad:</span>
+            <div class="opciones fila" role="radiogroup" aria-labelledby="lbl-paridad">
+              <label class="opcion"><input type="radio" name="paridad" id="par-par" value="par" checked>Par</label>
+              <label class="opcion"><input type="radio" name="paridad" id="par-impar" value="impar">Impar</label>
+            </div>
+          </div>
+
+          <button class="btn primary" id="btn-generar" type="button">Generar trama</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="t-canal">
+        <div class="panel-head">
+          <h2 id="t-canal"><span class="num">3</span>Simulación de errores</h2>
+        </div>
+        <div class="panel-body">
+          <p class="hint">También podés hacer clic directamente sobre cualquier bit de la grilla.</p>
+
+          <div class="lista-errores">
+            <button class="btn" type="button" data-error="simple">Error simple <span class="tag">1 bit</span></button>
+            <button class="btn" type="button" data-error="fila">Error doble - misma fila <span class="tag">2 bits</span></button>
+            <button class="btn" type="button" data-error="columna">Error doble - misma columna <span class="tag">2 bits</span></button>
+            <button class="btn riesgo" type="button" data-error="rectangulo">Error de rectángulo - caso no detectable <span class="tag">4 bits</span></button>
+          </div>
+
+          <p class="registro" id="registro" aria-live="polite">Sin errores aplicados.</p>
+
+          <button class="btn quiet" id="btn-restaurar" type="button">Restaurar trama original</button>
+          <hr class="separador">
+          <button class="btn primary" id="btn-verificar" type="button">Verificar y comparar métodos</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Columna derecha: paneles 2 y 4 -->
+    <div class="col">
+      <section class="panel" aria-labelledby="t-matriz">
+        <div class="panel-head">
+          <h2 id="t-matriz"><span class="num">2</span>Matriz de datos + paridad <span class="sub">(clic en un bit para invertirlo)</span></h2>
+          <ul class="resumen" id="resumen"></ul>
+        </div>
+        <div class="panel-body">
+          <div class="scroll-matriz" id="scroll-matriz">
+            <div class="vacio" id="vacio">Generá una trama para ver la matriz acá.</div>
+            <div class="matriz" id="matriz" role="grid" aria-label="Matriz de bits" hidden></div>
+          </div>
+
+          <ul class="leyenda" aria-label="Referencias de color">
+            <li><i class="l-dato"></i>Dato</li>
+            <li><i class="l-par"></i>Paridad (VRC / LRC)</li>
+            <li><i class="l-esq"></i>Esquina</li>
+            <li><i class="l-alt"></i>Invertido en el canal</li>
+            <li><i class="l-err"></i>Error señalado</li>
+            <li><i class="l-ok"></i>Corregido</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="t-resultados">
+        <div class="panel-head">
+          <h2 id="t-resultados"><span class="num">4</span>Comparación de métodos</h2>
+        </div>
+        <div class="panel-body">
+          <p class="desactualizado" id="desactualizado" hidden>La matriz cambió después de verificar. Volvé a verificar para actualizar la comparación.</p>
+
+          <div class="tabla-wrap">
+            <table class="comparacion">
+              <thead>
+                <tr>
+                  <th scope="col">Método</th>
+                  <th scope="col">¿Detecta el error?</th>
+                  <th scope="col">¿Corrige el error?</th>
+                  <th scope="col">Bit(s) señalado(s)</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-cuerpo"></tbody>
+            </table>
+          </div>
+
+          <p class="conclusion" id="conclusion">Todavía no se verificó la trama.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>Ingeniería en Sistemas de Información · UTN Facultad Regional Tucumán</footer>
+</div>
+
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+<!--/CONTENIDO-->
+
+<script src="js/paridad_logica.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
